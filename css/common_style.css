@@ -1,0 +1,44 @@
+#display-wrapper {
+   margin-bottom: 10rem !important; 
+}
+#display-wrapper,
+#connectedUI {
+    max-width: 90% !important;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Segoe UI" !important;
+}
+#output {
+    color: #383838;
+    font-size: 1.2rem;
+}
+#output .col-sm-6 {
+    width: 48% !important;
+}
+.bankName.alert {
+    padding: 0.5rem 1rem !important;
+}
+#net h4,
+h3.coa-type {
+    font-weight: 300;
+}
+#assets,
+#liabilities {
+    border: 1px solid #ededed;
+    border-radius: 2px;
+    padding: 2rem;  
+    margin-right: 1rem;
+}
+/* Customer override styles */
+.wp-block-spacer {
+    height: 0 !important;
+}
+.wp-block-post-title {
+    margin-bottom: 0 !important;
+}
+header .wp-container-4 {
+    padding-bottom: 2rem !important;
+}
+footer {
+    display: none !important;
+}
