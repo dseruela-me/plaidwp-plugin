@@ -252,7 +252,7 @@ function plaidwp_ajaxhandler() {
 
 // Save Customer Tokens
 function saveCustomerTokenDB($customer_id, $token_type, $token) {
-    // Save information to database.
+    // Save information to database...
     global $wpdb;
     $table_name = $wpdb->prefix . 'plaidwp_customer_tokens';
  
