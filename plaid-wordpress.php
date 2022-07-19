@@ -69,7 +69,7 @@ add_action( 'admin_menu', 'plaidwp_menu' );
 function plaidwp_custom_shortcode() {
 
     // Display main page
-    $displayText .= '<div id="display-wrapper" class="container mt-1 text-center">';
+    $displayText .= '<div id="display-wrapper" class="container mt-5 text-center">';
     $displayText .= '<a id="linkButton" href="#addBank" class="btn btn-primary">Connect to your bank</a>';
     $displayText .= '</div>';
     $displayText .= '<div id="connectedUI" class="d-none my-5">';
