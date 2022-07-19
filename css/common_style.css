@@ -1,6 +1,6 @@
-#display-wrapper {
+/* #display-wrapper {
    margin-bottom: 10rem !important; 
-}
+} */
 #display-wrapper,
 #connectedUI {
     max-width: 90% !important;
@@ -15,15 +15,24 @@ h1, h2, h3, h4, h5, h6 {
 #output .col-sm-6 {
     width: 48% !important;
 }
-.bankName.alert {
+#output .data-item {
+    font-size: 1rem !important;
+}
+.alert {
     padding: 0.5rem 1rem !important;
+    font-size: 1rem !important;
 }
 #net h4,
-h3.coa-type {
-    font-weight: 300;
+#tax-calculation h4,
+h3.coa-type { 
+    font-weight: 300; 
+}
+h3.totalBal { 
+    font-weight: 700; 
 }
 #assets,
-#liabilities {
+#liabilities,
+#tax-calculation-details {
     border: 1px solid #ededed;
     border-radius: 2px;
     padding: 2rem;  

@@ -7,16 +7,30 @@
 global $wpdb;
 
 $current_url = home_url(add_query_arg(array(), $wpdb->request));
-
-$tbl_name = $wpdb->prefix . 'plaidwp_config';  
-$result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $tbl_name WHERE id = %d", 99 ) );
-
-$client_id      = !empty($result->client_id) ? $result->client_id : "";
-$client_secret  = !empty($result->client_secret) ? $result->client_secret : "";
-$plaid_url      = !empty($result->plaid_url) ? $result->plaid_url : "";
-$callback_url   = !empty($result->callback_url) ? $result->callback_url : "";
 ?>
+<p>
+   <?php 
+      $values = get_option('plaidwp_settings'); 
 
+      if( ! empty( $values ) ) {
+         foreach($values as $key => $value) {
+            if($key == 'client_id') {
+               $client_id = ! empty( $value ) ? $value : '';
+            }
+            if($key == 'client_secret') {
+               $client_secret = ! empty( $value ) ? $value : '';
+            }
+            if($key == 'plaid_url') {
+               $plaid_url = ! empty( $value ) ? $value : '';
+            }
+            if($key == 'callback_url') {
+               $callback_url = ! empty( $value ) ? $value : '';
+            }
+            // echo $key . " - " . $value . "<br>";
+         }
+      }
+   ?>
+</p>
 <div class="container">
     <hr>   
     <div class="well text-center">

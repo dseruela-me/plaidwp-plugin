@@ -10,8 +10,15 @@ function createLinkToken() {
             process: 'create_plaid_link_token',
         },
         success: function(data, textStatus, XMLHttpRequest) {
-            console.log('Status: ' + textStatus);
-            localStorage.setItem("linkTokenData", data);
+            var tmp = JSON.parse(data);
+
+            if( tmp.error_code ) {
+                console.log('Error: ' + tmp.error_code);
+                console.log('Error: ' + tmp.error_message);
+            } else {
+                console.log('Status: ' + textStatus);
+                localStorage.setItem("linkTokenData", data);
+            }
         },
         error: function() {
             console.log('Error');
@@ -52,6 +59,9 @@ const checkConnectedStatus = async function() {
                 document.querySelector("#connectedUI").classList.add("d-block");
                 document.querySelector("#output").classList.add("d-none");
                 document.querySelector("#bankName").innerHTML = localStorage.getItem("institutionName");
+
+                // Display account balance.
+                getAccountsBalance();
             } 
         } catch (error) {
             console.log(`We encountered an error: ${error}`);
@@ -84,44 +94,60 @@ function getAccountsBalance() {
             jQuery('#output #liabilities').children().remove();
 
             var tmp = JSON.parse(data);
-            //jQuery("#output-json").append(data);
+            // jQuery("#output-json").append(data);
             jQuery('#output').removeClass('d-none');
-            
-            var numAssets = [];
-            var numLiabilities = [];
-            for (let i = 0; i < tmp.accounts.length; i++) {
-                var type = tmp.accounts[i].type.charAt(0).toUpperCase() + tmp.accounts[i].type.slice(1);
-                var bal = (tmp.accounts[i].balances.available) == null ? 0 : tmp.accounts[i].balances.available; 
-                var acctName = tmp.accounts[i].name;
-                var currency = (tmp.accounts[i].balances.iso_currency_code == "USD") ? "$" : "";
 
-                if( type == "Depository" || type == "Investment" || type == "Loan" ) {
-                    numAssets.push(bal);
-                    console.log(type + ': ' + acctName + ' - ' + bal + ' ' + currency);
-                    jQuery('#output #assets').append('<div class="row p-2"><div class="col-sm-8"><b>' + type + ':</b> ' + acctName + '</div><div class="col-sm-4">' + currency + custom_number_format(bal, '.', ',') + '</div></div>');
-                } else if( type == "Credit" ) {
-                    numLiabilities.push(bal);
-                    console.log(type + ': ' + acctName + ' - ' + bal + ' ' + currency);
-                    jQuery('#output #liabilities').append('<div class="row p-2"><div class="col-sm-8"><b>' + type + ':</b> ' + acctName + '</div><div class="col-sm-4">' + currency + custom_number_format(bal, '.', ',') + '</div></div>');
+            if( tmp.error_code ) {
+                console.log('Error: ' + tmp.error_code);
+                console.log('Error: ' + tmp.error_message);
+                alert('Error: ' + tmp.error_code + ' - ' + tmp.error_message);
+            } else {
+                var numAssets = [];
+                var numLiabilities = [];
+
+                for (let i = 0; i < tmp.accounts.length; i++) {
+                    var type = tmp.accounts[i].type.charAt(0).toUpperCase() + tmp.accounts[i].type.slice(1);
+                    var avail_bal = (tmp.accounts[i].balances.available) == null ? 0 : tmp.accounts[i].balances.available; 
+                    var current_bal = (tmp.accounts[i].balances.current) == null ? 0 : tmp.accounts[i].balances.current; 
+                    var acctName = tmp.accounts[i].name;
+                    var currency = (tmp.accounts[i].balances.iso_currency_code == "USD") ? "$" : "";
+    
+                    if( type == "Depository" || type == "Investment" ) {
+                        numAssets.push(current_bal);
+                        jQuery('#output #assets').append('<div class="row py-2 data-item"><div class="col-sm-8"><b>' + type + ':</b> ' + acctName + '</div><div class="col-sm-4">' + currency + custom_number_format(current_bal, 2, '.', ',') + '</div></div>');
+    
+                        console.log(type + '(available): ' + acctName + ' - ' + currency + avail_bal);
+                        console.log(type + '(current): ' + acctName + ' - ' + currency + current_bal);
+                    } else if( type == "Credit" || type == "Loan" ) {
+                        numLiabilities.push(current_bal);
+                        jQuery('#output #liabilities').append('<div class="row py-2 data-item"><div class="col-sm-8"><b>' + type + ':</b> ' + acctName + '</div><div class="col-sm-4">' + currency + custom_number_format(current_bal, 2, '.', ',') + '</div></div>');
+    
+                        console.log(type + '(available): ' + acctName + ' - ' + currency + avail_bal);
+                        console.log(type + '(current): ' + acctName + ' - ' + currency + current_bal);
+                    }
+                    
                 }
+
+                // Get Totals
+                var totalAssets = getTotal(numAssets);
+                var totalLiabilities = getTotal(numLiabilities);
+
+                // Display Totals
+                jQuery('#output #netAmount').text( currency + custom_number_format((totalAssets - totalLiabilities), 2, '.', ', ') );
+                jQuery('#output #assets').prepend('<div class="col-sm-12"><h3 class="totalBal">' + currency + custom_number_format(totalAssets, 2, '.', ', ') + '</h3><h3 class="coa-type py-4">Assets</h3></div>');
+                jQuery('#output #liabilities').prepend('<div class="col-sm-12"><h3 class="totalBal">' + currency + custom_number_format(totalLiabilities, 2, '.', ', ') + '</h3><h3 class="coa-type py-4">Liabilities</h3></div>');
+            
+                console.log('Total Assets:' + totalAssets);
+                console.log('Total Liabilities:' + totalLiabilities);
+                console.log('Total Net Amount:' + (totalAssets - totalLiabilities) );
+                console.log('Total Accounts: ' + tmp.accounts.length);
                 
+                getBankName(tmp.item.institution_id);
             }
             
-            // Get Totals
-            var totalAssets = getTotal(numAssets);
-            var totalLiabilities = getTotal(numLiabilities);
-
-            // Display Totals
-            jQuery('#output #netAmount').text( currency + custom_number_format((totalAssets - totalLiabilities), '.', ', ') );
-            jQuery('#output #assets').prepend('<div class="col-sm-12"><h3>' + currency + custom_number_format(totalAssets, '.', ', ') + '</h3><h3 class="coa-type">Assets</h3></div>');
-            jQuery('#output #liabilities').prepend('<div class="col-sm-12"><h3>' + currency + custom_number_format(totalLiabilities, '.', ', ') + '</h3><h3 class="coa-type">Liabilities</h3></div>');
-
-            console.log('Total Assets:' + totalAssets);
-            console.log('Total Liabilities:' + totalLiabilities);
-            console.log('Total Net Amount:' + (totalAssets - totalLiabilities) );
-            console.log('Total Accounts: ' + tmp.accounts.length);
-            
-            getBankName(tmp.item.institution_id);
+        },
+        'error': function() {
+            console.log('Invalid API keys used.');
         }
     });
 }
@@ -199,65 +225,70 @@ jQuery(document).ready(function(){
     var storedTokenData = localStorage.getItem("linkTokenData");
     var linkTokenData = JSON.parse(storedTokenData);
     
-    console.log(`I retrieved ${linkTokenData.link_token} from local storage`);
+
+    if( linkTokenData.error_code ) {
+        console.log('Error: ' + linkTokenData.error_code);
+        console.log('Error: ' + linkTokenData.error_message);
+    } else {
+        console.log(`I retrieved ${linkTokenData.link_token} from local storage`);
+        jQuery(function(){
     
-
-    jQuery(function(){
+            var linkHandler = Plaid.create({  
+                        selectAccount: true,
+                        env: 'sandbox',
+                        apiVersion: 'v2',
+                        clientName: 'Taxsurety Test App',
+                        //key: linkTokenData.link_token,
+                        product: ['transactions'],
+                        // product: ['auth', 'transactions', 'identity'],
+                        //webhook: 'https://myurl.com/webhooks/p_responses.php',
+                        token: linkTokenData.link_token,
+                        //receivedRedirectUri: window.location.href,
+                        onLoad: function() {
+                            // Optional, called when Link loads
+                        },
+                        onSuccess: function(public_token, metadata, customer_id) {  
+                            // Send the public_token to your app server.
+                            // The metadata object contains info about the institution the
+                            // user selected and the account ID or IDs, if the
+                            // Account Select view is enabled.   
+                            getAccessToken(public_token, metadata);
+                            var storedAccessTokenData = localStorage.getItem("accessTokenData");
+                            var accessTokenData = JSON.parse(storedAccessTokenData);
     
-        var linkHandler = Plaid.create({  
-                    selectAccount: true,
-                    env: 'sandbox',
-                    apiVersion: 'v2',
-                    clientName: 'Taxsurety Test App',
-                    //key: linkTokenData.link_token,
-                    product: ['auth', 'transactions', 'identity'],
-                    //webhook: 'https://myurl.com/webhooks/p_responses.php',
-                    token: linkTokenData.link_token,
-                    //receivedRedirectUri: window.location.href,
-                    onLoad: function() {
-                        // Optional, called when Link loads
-                    },
-                    onSuccess: function(public_token, metadata, customer_id) {  
-                        // Send the public_token to your app server.
-                        // The metadata object contains info about the institution the
-                        // user selected and the account ID or IDs, if the
-                        // Account Select view is enabled.   
-                        getAccessToken(public_token, metadata);
-                        var storedAccessTokenData = localStorage.getItem("accessTokenData");
-                        var accessTokenData = JSON.parse(storedAccessTokenData);
-
-                        localStorage.setItem("institutionName", metadata.institution.name);
-                        
-                        console.log(`Access Token: ${accessTokenData.access_token} from local storage`);
-                        // window.location.href = "http://localhost/taxsuretytest/plaid-wp/";
-                        // Check connected status.
-                        checkConnectedStatus();
-
-                        console.log('Metadata institution: ' + metadata.institution.name);
-                        console.log('Metadata institution_id: ' + metadata.institution.institution_id);
-                        console.log('Metadata account_id: ' + metadata.account_id);
-                        // console.log('Metadata item_id: ' + metadata.item_id);
-                        // console.log('Customer Id: ' + customer_id);
-                    },
-                    onExit: function(err, metadata) {
-                        // The user exited the Link flow.
-                        if (err != null) {
-                            // The user encountered a Plaid API error prior to exiting.
-                        }
-                        // metadata contains information about the institution
-                        // that the user selected and the most recent API request IDs.
-                        // Storing this information can be helpful for support.
-                    },
+                            localStorage.setItem("institutionName", metadata.institution.name);
+                            
+                            console.log(`Access Token: ${accessTokenData.access_token} from local storage`);
+                            // window.location.href = "http://localhost/taxsuretytest/plaid-wp/";
+                            // Check connected status.
+                            checkConnectedStatus();
+    
+                            console.log('Metadata institution: ' + metadata.institution.name);
+                            console.log('Metadata institution_id: ' + metadata.institution.institution_id);
+                            console.log('Metadata account_id: ' + metadata.account_id);
+                            // console.log('Metadata item_id: ' + metadata.item_id);
+                            // console.log('Customer Id: ' + customer_id);
+                        },
+                        onExit: function(err, metadata) {
+                            // The user exited the Link flow.
+                            if (err != null) {
+                                // The user encountered a Plaid API error prior to exiting.
+                            }
+                            // metadata contains information about the institution
+                            // that the user selected and the most recent API request IDs.
+                            // Storing this information can be helpful for support.
+                        },
+            });
+            
+            // Trigger the standard Institution Select view 
+            jQuery('#linkButton').on('click', function(e){
+                linkHandler.open();
+            });
+    
+            // Trigger the Account Balance View
+            jQuery("#getAccounts").on("click", function(){
+                getAccountsBalance();
+            });
         });
-        
-        // Trigger the standard Institution Select view 
-        jQuery('#linkButton').on('click', function(e){
-            linkHandler.open();
-        });
-
-        // Trigger the Account Balance View
-        jQuery("#getAccounts").on("click", function(){
-            getAccountsBalance();
-        });
-    });
+    }
 });
