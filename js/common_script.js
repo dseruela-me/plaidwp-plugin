@@ -158,7 +158,7 @@ function getAccountsBalance() {
                 var totalLiabilities = getTotal(numLiabilities);
 
                 // Display Totals
-                jQuery('#output #netAmount').text( currency + custom_number_format((totalAssets - totalLiabilities), 2, '.', ', ') );
+                jQuery('#netAmount').text( currency + custom_number_format((totalAssets - totalLiabilities), 2, '.', ', ') );
                 jQuery('#output #assets').prepend('<div class="col-sm-12"><h3 class="totalBal">' + currency + custom_number_format(totalAssets, 2, '.', ', ') + '</h3><h3 class="coa-type py-4">Assets</h3></div>');
                 jQuery('#output #liabilities').prepend('<div class="col-sm-12"><h3 class="totalBal">' + currency + custom_number_format(totalLiabilities, 2, '.', ', ') + '</h3><h3 class="coa-type py-4">Liabilities</h3></div>');
             
@@ -196,7 +196,7 @@ function getBankName(institution) {
 
             console.log('Bank code: ' + tmp.institution.institution_id);
             console.log('Bank name: ' + tmp.institution.name);
-            jQuery('#output #bankLinked').append('<h1>Bank Linked</h1>' +
+            jQuery('#bankLinked').append('<h1>Bank Linked</h1>' +
                                         '<div class="bankName alert alert-secondary alert-dismissible fade show" role="alert">' + 
                                         tmp.institution.name + 
                                         '<button type="button" id="disconnectBank" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +

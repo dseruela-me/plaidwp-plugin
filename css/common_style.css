@@ -31,8 +31,7 @@ h3.totalBal {
 #tax-calculation-details {
     border: 1px solid #ededed;
     border-radius: 2px;
-    padding: 2rem;  
-    margin-right: 1rem;
+    padding: 2rem;     
 }
 /* Customer override styles */
 .wp-block-spacer {

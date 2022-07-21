@@ -69,32 +69,39 @@ add_action( 'admin_menu', 'plaidwp_menu' );
 function plaidwp_custom_shortcode() {
 
     // Display main page
-    $displayText .= '<div id="display-wrapper" class="container mt-5 text-center">';
-    $displayText .= '<button type="button" id="linkButton" class="btn btn-primary">Connect to your bank</button>';
-    $displayText .= '</div>';
-    $displayText .= '<div id="connectedUI" class="d-none my-5">';
-            $displayText .= '<div class="introtext-wrapper text-center">';
-                $displayText .= '<span id="connectDetails">Hi there! You\'re now connected to <span id="bankName"></span>.</span>';
-            $displayText .= '</div>';
-            $displayText .= '<samp id="output-json" class="my-5 text-center" style="font-size: 11px;"></samp>';
-            $displayText .= '<div id="output" class="m-5 d-none row">';
-                $displayText .= '<div id="net" class="col-sm-12">';
-                    $displayText .= '<h1>Business/Personal Net Worth Statement</h1>';
-                    $displayText .= '<h4>A summary of your assets and liabilities</h4>';
-                    $displayText .= '<h1 id="netAmount" class="my-5"></h1>';
-                $displayText .= '</div>';
-                $displayText .= '<div id="assets" class="col-sm-6"></div>';
-                $displayText .= '<div id="liabilities" class="col-sm-6"></div>';
-                $displayText .= '<div id="bankLinked" class="col-sm-12 my-5">';
-                $displayText .= '</div>';
-            $displayText .= '</div>';
-        $displayText .= '</div>';
-    $displayText .= '<div id="disconnectedUI" class="d-none my-5">';
-            $displayText .= '<div class="introtext-wrapper text-center">';
-                $displayText .= '<span id="disconnectDetails">You have been disconnected. Please connect to your bank!</span>';
-            $displayText .= '</div>';
-    $displayText .= '</div>';    
-    $displayText .= '</div>';
+    $displayText = '<div id="display-wrapper" class="container mt-5 text-center">
+                        <button type="button" id="linkButton" class="btn btn-primary">Connect to your bank</button>
+                    </div>
+                    <div id="connectedUI" class="d-none my-5">
+                            <div class="introtext-wrapper text-center">
+                                <span id="connectDetails">Hi there! You\'re now connected to <span id="bankName"></span>.</span>
+                            </div>
+                            <samp id="output-json" class="my-5 text-center" style="font-size: 11px;"></samp>
+                            <div class="my-5 row">
+                                <div id="net" class="col-sm-12">
+                                    <h1>Business/Personal Net Worth Statement</h1>
+                                    <h4>A summary of your assets and liabilities</h4>
+                                    <h1 id="netAmount" class="mt-5"></h1>
+                                </div>
+                            </div>
+                            <div id="output" class="my-5 d-none row">
+                                <div class="col-lg-6 col-sm-12 my-2">
+                                    <div id="assets" class="col-12"></div>
+                                </div>
+                                <div class="col-lg-6 col-sm-12 my-2">
+                                    <div id="liabilities" class="col-12"></div>
+                                </div>
+                            </div>
+                            <div class="my-5 row">
+                                <div id="bankLinked" class="col-sm-12"></div>
+                            </div>
+                    </div>
+                    <div id="disconnectedUI" class="d-none my-5">
+                            <div class="introtext-wrapper text-center">
+                                <span id="disconnectDetails">You have been disconnected. Please connect to your bank!</span>
+                            </div>
+                    </div>    
+                    </div>';
     
     return $displayText;
 }
