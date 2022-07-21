@@ -18,10 +18,6 @@ h1, h2, h3, h4, h5, h6 {
 #output .data-item {
     font-size: 1rem !important;
 }
-.alert {
-    padding: 0.5rem 1rem !important;
-    font-size: 1rem !important;
-}
 #net h4,
 #tax-calculation h4,
 h3.coa-type { 

@@ -70,7 +70,7 @@ function plaidwp_custom_shortcode() {
 
     // Display main page
     $displayText .= '<div id="display-wrapper" class="container mt-5 text-center">';
-    $displayText .= '<a id="linkButton" href="#addBank" class="btn btn-primary">Connect to your bank</a>';
+    $displayText .= '<button type="button" id="linkButton" class="btn btn-primary">Connect to your bank</button>';
     $displayText .= '</div>';
     $displayText .= '<div id="connectedUI" class="d-none my-5">';
             $displayText .= '<div class="introtext-wrapper text-center">';
@@ -89,6 +89,11 @@ function plaidwp_custom_shortcode() {
                 $displayText .= '</div>';
             $displayText .= '</div>';
         $displayText .= '</div>';
+    $displayText .= '<div id="disconnectedUI" class="d-none my-5">';
+            $displayText .= '<div class="introtext-wrapper text-center">';
+                $displayText .= '<span id="disconnectDetails">You have been disconnected. Please connect to your bank!</span>';
+            $displayText .= '</div>';
+    $displayText .= '</div>';    
     $displayText .= '</div>';
     
     return $displayText;

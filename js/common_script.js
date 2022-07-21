@@ -16,7 +16,7 @@ function createLinkToken() {
                 console.log('Error: ' + tmp.error_code);
                 console.log('Error: ' + tmp.error_message);
             } else {
-                console.log('Status: ' + textStatus);
+                console.log('Status: ' + textStatus + ' - Link token created.');
                 localStorage.setItem("linkTokenData", data);
             }
         },
@@ -41,13 +41,13 @@ function getAccessToken(public_token, metadata) {
             customer_id: 'customer-unique-id',
             },
         'success': function(data, textStatus, XMLHttpRequest) {
-            console.log('Status: ' + textStatus);
+            console.log('Status: ' + textStatus + ' - Access token created.');
             localStorage.setItem("accessTokenData", data);
         }
     });
 }
 
-const checkConnectedStatus = async function() {
+function checkConnectedStatus() {
     // check if access_token is available.
     if(localStorage.getItem("accessTokenData") !== null) {
         try {
@@ -55,10 +55,13 @@ const checkConnectedStatus = async function() {
             var accessTokenData = JSON.parse(storedAccessTokenData);
     
             if(accessTokenData.access_token !== null) {
-                document.querySelector("#connectedUI").classList.remove("d-none");
-                document.querySelector("#connectedUI").classList.add("d-block");
-                document.querySelector("#output").classList.add("d-none");
-                document.querySelector("#bankName").innerHTML = localStorage.getItem("institutionName");
+                jQuery("#connectedUI").removeClass("d-none");
+                jQuery("#connectedUI").addClass("d-block");
+                jQuery("#output").removeClass("d-none");
+                jQuery("#bankName").text( localStorage.getItem("institutionName") );
+
+                jQuery("#disconnectedUI").addClass("d-none");
+                jQuery("#disconnectedUI").removeClass("d-block");
 
                 // Display account balance.
                 getAccountsBalance();
@@ -66,9 +69,31 @@ const checkConnectedStatus = async function() {
         } catch (error) {
             console.log(`We encountered an error: ${error}`);
         }
+    } else {
+        jQuery("#disconnectedUI").removeClass("d-none");
+        jQuery("#disconnectedUI").addClass("d-block");
+
+        jQuery("#connectedUI").addClass("d-none");
+        jQuery("#connectedUI").removeClass("d-block");
+        jQuery("#output").addClass("d-none");
+        console.log("Please connect to your bank!");
     }
     
-};
+}
+
+function disconnectBank() {
+    localStorage.clear();
+    jQuery('#connectedUI').removeClass('d-block');
+    jQuery('#connectedUI').addClass('d-none').hide();
+    jQuery('#output').addClass('d-none').hide();
+
+    console.log('Bank disconnected.');
+    //alert('Bank disconnected.');
+
+    setTimeout(function(){
+        location.reload(1);
+    }, 3000);
+}
 
 // Get accounts balance.
 function getAccountsBalance() {
@@ -171,7 +196,11 @@ function getBankName(institution) {
 
             console.log('Bank code: ' + tmp.institution.institution_id);
             console.log('Bank name: ' + tmp.institution.name);
-            jQuery('#output #bankLinked').append('<h1>Bank Linked</h1><div class="bankName alert alert-secondary">' + tmp.institution.name + '</div>');
+            jQuery('#output #bankLinked').append('<h1>Bank Linked</h1>' +
+                                        '<div class="bankName alert alert-secondary alert-dismissible fade show" role="alert">' + 
+                                        tmp.institution.name + 
+                                        '<button type="button" id="disconnectBank" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                        '</div>');
         }
     });
 }
@@ -289,6 +318,20 @@ jQuery(document).ready(function(){
             jQuery("#getAccounts").on("click", function(){
                 getAccountsBalance();
             });
+
+            // Trigger if there are changes to the DOM after successful plaid connection.
+            jQuery('#output').bind('DOMSubtreeModified', function(){
+                jQuery('#disconnectBank').on('click', function(){
+                    disconnectBank();
+                });
+            });
+
+            // Trigger disconnect bank linked.
+            jQuery('#disconnectBank').on('click', function(){
+                disconnectBank();
+            });
+            
+
         });
     }
 });
